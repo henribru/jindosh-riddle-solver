@@ -57,23 +57,23 @@ pattern = r"""
 At the dinner party were Lady Winslow, Doctor Marcolla, Countess
 Contee, Madam Natsiou, and Baroness Finch\.
 
-The women sat in a row\. They all wore different colors and (?P<p1>\w+ \w+)
-wore a jaunty (?P<c1>\w+) hat\. (?P<p2>\w+ \w+) was at the far left,
-next to the guest wearing a (?P<c2>\w+) jacket\. The lady in (?P<c3>\w+) sat left of
-someone in (?P<c4>\w+)\. I remember that \w+ outfit because the woman
-spilled her (?P<d1>\w+) all over it\. The traveler from (?P<t1>\w+) was dressed
-entirely in (?P<c5>\w+)\. When one of the dinner guests bragged about her
-(?P<h1>\w+( \w+)?), the woman next to her said they were finer in (?P<t2>\w+),
+The women sat in a row\. They all wore different colors and (?P<person1>\w+ \w+)
+wore a jaunty (?P<color1>\w+) hat\. (?P<person2>\w+ \w+) was at the far left,
+next to the guest wearing a (?P<color2>\w+) jacket\. The lady in (?P<color3>\w+) sat left of
+someone in (?P<color4>\w+)\. I remember that \w+ outfit because the woman
+spilled her (?P<drink1>\w+) all over it\. The traveler from (?P<town1>\w+) was dressed
+entirely in (?P<color5>\w+)\. When one of the dinner guests bragged about her
+(?P<heirloom1>\w+( \w+)?), the woman next to her said they were finer in (?P<town2>\w+),
 where she lived\.
 
-So (?P<p3>\w+ \w+) showed off a prized (?P<h2>\w+( \w+)?), at which the lady from
-(?P<t3>\w+) scoffed, saying it was no match for her (?P<h3>\w+( \w+)?)\.
-Someone else carried a valuable (?P<h4>\w+( \w+)?) and when she saw it,
-the visitor from (?P<t4>\w+) next to her almost spilled her neighbor's
-(?P<d2>\w+)\. (?P<p4>\w+ \w+) raised her (?P<d3>\w+) in toast\. The lady from (?P<t5>\w+),
-full of (?P<d4>\w+), jumped up onto the table, falling onto the guest in the
-center seat, spilling the poor woman's (?P<d5>\w+)\. Then (?P<p5>\w+ \w+)
-captivated them all with a story about her wild youth in (?P<t6>\w+)\.
+So (?P<person3>\w+ \w+) showed off a prized (?P<heirloom2>\w+( \w+)?), at which the lady from
+(?P<town3>\w+) scoffed, saying it was no match for her (?P<heirloom3>\w+( \w+)?)\.
+Someone else carried a valuable (?P<heirloom4>\w+( \w+)?) and when she saw it,
+the visitor from (?P<town4>\w+) next to her almost spilled her neighbor's
+(?P<drink2>\w+)\. (?P<person4>\w+ \w+) raised her (?P<drink3>\w+) in toast\. The lady from (?P<town5>\w+),
+full of (?P<drink4>\w+), jumped up onto the table, falling onto the guest in the
+center seat, spilling the poor woman's (?P<drink5>\w+)\. Then (?P<person5>\w+ \w+)
+captivated them all with a story about her wild youth in (?P<town6>\w+)\.
 
 In the morning, there were four heirlooms under the table: (the )?\w+( \w+)?,
 (the )?\w+( \w+)?, (the )?\w+( \w+)?, and (the )?\w+( \w+)?\.
@@ -86,11 +86,11 @@ pattern = " ".join(pattern.split("\n"))
 match = re.fullmatch(pattern, puzzle)
 
 determined = [
-    match.group("c1", "p1"),
-    ("first", match.group("p2")),
-    match.group("h2", "p3"),
-    match.group("d3", "p4"),
-    match.group("t6", "p5"),
+    match.group("color1", "person1"),
+    ("first", match.group("person2")),
+    match.group("heirloom2", "person3"),
+    match.group("drink3", "person4"),
+    match.group("town6", "person5"),
 ]
 
 for variable, name in determined:
@@ -99,27 +99,27 @@ for variable, name in determined:
     )
 
 equal_variables = [
-    ("second", match.group("c2")),
-    match.group("c3", "d1"),
-    match.group("t1", "c5"),
-    match.group("t3", "h3"),
-    match.group("t5", "d4"),
-    ("third", match.group("d5")),
+    ("second", match.group("color2")),
+    match.group("color3", "drink1"),
+    match.group("town1", "color5"),
+    match.group("town3", "heirloom3"),
+    match.group("town5", "drink4"),
+    ("third", match.group("drink5")),
 ]
 
 for equal in equal_variables:
     jindosh_puzzle.addConstraint(AllEqualConstraint(), equal)
 
 
-def complex_constraint1(c3, c4, *seats):
-    """The lady in <c3> sat left of someone in <c4>."""
-    if seats[-1] == c3:
+def complex_constraintown1(color3, color4, *seats):
+    """The lady in <color3> sat left of someone in <color4>."""
+    if seats[-1] == color3:
         return False
-    return seats[seats.index(c3) + 1] == c4
+    return seats[seats.index(color3) + 1] == color4
 
 
 jindosh_puzzle.addConstraint(
-    complex_constraint1, [match.group("c3"), match.group("c4"), *seats]
+    complex_constraintown1, [match.group("color3"), match.group("color4"), *seats]
 )
 
 
@@ -132,31 +132,31 @@ def get_neighbouring_seat(i, seats):
         return [(i - 1, seats[i - 1]), (i + 1, seats[i + 1])]
 
 
-def complex_constraint2(h1, t2, *seats):
+def complex_constraintown2(heirloom1, town2, *seats):
     """When one of the dinner guests bragged about her
-    <h1>, the woman next to her said they were finer in <t2>,
+    <heirloom1>, the woman next to her said they were finer in <town2>,
     where she lived."""
-    return any(seat == t2 for _, seat in get_neighbouring_seat(seats.index(h1), seats))
+    return any(seat == town2 for _, seat in get_neighbouring_seat(seats.index(heirloom1), seats))
 
 
 jindosh_puzzle.addConstraint(
-    complex_constraint2, [match.group("h1"), match.group("t2"), *seats]
+    complex_constraintown2, [match.group("heirloom1"), match.group("town2"), *seats]
 )
 
 
-def complex_constraint3(h4, t4, d2, *seats):
-    """Someone else carried a valuable <h4> and when she saw it,
-    the visitor from <t4> next to her almost spilled her neighbor's
-    <d2>."""
+def complex_constraintown3(heirloom4, town4, drink2, *seats):
+    """Someone else carried a valuable <heirloom4> and when she saw it,
+    the visitor from <town4> next to her almost spilled her neighbor's
+    <drink2>."""
     return any(
-        seat == t4 and any(seat == d2 for _, seat in get_neighbouring_seat(j, seats))
-        for j, seat in get_neighbouring_seat(seats.index(h4), seats)
+        seat == town4 and any(seat == drink2 for _, seat in get_neighbouring_seat(j, seats))
+        for j, seat in get_neighbouring_seat(seats.index(heirloom4), seats)
     )
 
 
 jindosh_puzzle.addConstraint(
-    complex_constraint3,
-    [match.group("h4"), match.group("t4"), match.group("d2"), *seats],
+    complex_constraintown3,
+    [match.group("heirloom4"), match.group("town4"), match.group("drink2"), *seats],
 )
 solution = jindosh_puzzle.getSolution()
 ordered_names = [solution[seat] for seat in seats]
